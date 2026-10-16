@@ -1,0 +1,11 @@
+backups/
+artifacts/
+*.log
+node_modules/
+.env
+.env.*
+!.env.example
+*.har
+*.saz
+storage-state*.json
+cookies*.json
