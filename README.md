@@ -12,7 +12,7 @@
 
 <!-- moe-counter:start -->
 <a href="https://github.com/journey-ad/Moe-Counter"><img src="https://count.getloli.com/get/@ppepperkok-hue.xiumi-codex?theme=asoul" alt="README views" width="360" /></a>
-<br /><sub>README views · 图片请求累计值，受 GitHub 缓存影响，并非独立访客数。</sub>
+<br /><sub>README views ·</sub>
 <!-- moe-counter:end -->
 
 </div>
