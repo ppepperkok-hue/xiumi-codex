@@ -114,6 +114,8 @@ my-assets/
 node xiumi.mjs create-article --content examples/content.json --assets ./my-assets --out artifacts/created.json
 ```
 
+素材路径必须是 `--assets` 内的相对路径；绝对路径、`../` 越界路径以及指向目录外部的符号链接会在上传前被拒绝。
+
 此命令先上传图片，再创建一份新草稿，最后读回验证。它是固定结构的原生组件生成器，不是任意 HTML 的保真转换器。中途失败时，已上传图片不会自动删除；重试前请先检查账号，避免重复草稿。
 
 ## 工作方式

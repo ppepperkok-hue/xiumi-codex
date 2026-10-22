@@ -1,4 +1,43 @@
 import crypto from 'node:crypto';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+
+export async function resolveAssetFile(assetDir, filename) {
+  if (typeof assetDir !== 'string' || !assetDir) throw new Error('Asset directory is required.');
+  if (typeof filename !== 'string' || !filename) throw new Error('Asset filename must be a non-empty relative path.');
+  if (filename.includes('\0')) throw new Error('Asset filename contains an invalid character.');
+
+  const portableName = filename.replace(/\\/g, '/');
+  if (path.posix.isAbsolute(portableName) || path.win32.isAbsolute(filename) || /^[A-Za-z]:/.test(portableName)) {
+    throw new Error(`Asset path must be relative: ${filename}`);
+  }
+
+  let root;
+  try { root = await fs.realpath(path.resolve(assetDir)); }
+  catch (error) {
+    if (error.code === 'ENOENT' || error.code === 'ENOTDIR') throw new Error(`Asset directory not found: ${assetDir}`);
+    throw error;
+  }
+  if (!(await fs.stat(root)).isDirectory()) throw new Error(`Asset directory is not a directory: ${assetDir}`);
+
+  const candidate = path.resolve(root, portableName);
+  if (!isWithin(root, candidate)) throw new Error(`Asset path must stay within --assets: ${filename}`);
+
+  let file;
+  try { file = await fs.realpath(candidate); }
+  catch (error) {
+    if (error.code === 'ENOENT' || error.code === 'ENOTDIR') throw new Error(`Asset file not found within --assets: ${filename}`);
+    throw error;
+  }
+  if (!isWithin(root, file)) throw new Error(`Asset path must stay within --assets: ${filename}`);
+  if (!(await fs.stat(file)).isFile()) throw new Error(`Asset path is not a file: ${filename}`);
+  return file;
+}
+
+function isWithin(root, candidate) {
+  const relative = path.relative(root, candidate);
+  return relative !== '' && relative !== '..' && !relative.startsWith(`..${path.sep}`) && !path.isAbsolute(relative);
+}
 
 export function validateId(value) {
   if (!/^\d+$/.test(String(value)) || !Number.isSafeInteger(Number(value)) || Number(value) <= 0) throw new Error('Invalid show ID.');

@@ -4,7 +4,7 @@ import path from 'node:path';
 import os from 'node:os';
 import {createRequire} from 'node:module';
 import {fileURLToPath} from 'node:url';
-import {validateId,assertRevision,replaceText,buildArticle,summarize,textComponent} from './lib.mjs';
+import {validateId,assertRevision,replaceText,buildArticle,summarize,textComponent,resolveAssetFile} from './lib.mjs';
 
 const ROOT=path.dirname(fileURLToPath(import.meta.url));
 async function loadChromium() {
@@ -133,13 +133,15 @@ async function main() {
     }
     else if(command==='upload') result=await upload(page,options.file);
     else if(command==='create-article') {
-      const content=await readJson(options.content);const assetDir=path.resolve(options.assets);
+      const content=await readJson(options.content);const assetDir=options.assets;
       const cacheFile=path.join(ROOT,'artifacts','uploaded-assets.json');
       let assets={};try {assets=await readJson(cacheFile);} catch(error) {if(error.code!=='ENOENT') throw error;}
       const filenames=['brand-header.png','activity-hero.png',...content.photos,'brand-footer.png','cover-wide.png'];
-      for(const filename of filenames) {
+      const files=await Promise.all(filenames.map(filename=>resolveAssetFile(assetDir,filename)));
+      for(let i=0;i<filenames.length;i++) {
+        const filename=filenames[i];
         // Always use the current account's storage and current input bytes.
-        assets[filename]=await upload(page,path.join(assetDir,filename));
+        assets[filename]=await upload(page,files[i]);
         await writeJson(cacheFile,assets);
         process.stderr.write(`Uploaded ${filename}\n`);
       }

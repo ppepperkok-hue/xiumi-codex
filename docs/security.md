@@ -4,6 +4,7 @@
 - Authenticate manually in the controlled browser; do not paste credentials into issues or logs.
 - Cookies remain in the browser. This CLI does not export browser storage or save credentials.
 - Snapshots, uploaded-asset maps, and backups can contain private article content. They are ignored by Git and should remain local.
+- `create-article` accepts only existing relative asset files inside `--assets`. Absolute paths, traversal, sibling-prefix escapes, and symlinks resolving outside the asset directory are rejected before upload.
 - Only invoke edits authorized by the account owner. Server authorization errors are authoritative.
 - A stale snapshot is rejected. Re-read the document and reapply the intended change instead of forcing a save.
 - The tool has no publish, send, account-management, permission-change, or delete command.

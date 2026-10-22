@@ -64,6 +64,8 @@ Use [examples/content.json](examples/content.json) and provide `brand-header.png
 node xiumi.mjs create-article --content examples/content.json --assets ./my-assets --out artifacts/created.json
 ```
 
+Asset paths must be relative to and remain inside `--assets`. Absolute paths, traversal, and symlinks resolving outside the directory are rejected before upload.
+
 This uploads assets, builds ordinary native components, creates a new draft, and reads it back. It is a focused recipe, not a general HTML fidelity converter. Uploaded assets are not rolled back after later failures. Inspect your account before retrying an interrupted create.
 
 ## Verification and scope
