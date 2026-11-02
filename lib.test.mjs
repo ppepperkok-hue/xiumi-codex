@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {spawnSync} from 'node:child_process';
+import {fileURLToPath} from 'node:url';
 import {validateId,assertRevision,replaceText,buildArticle,imageComponent,textComponent,summarize} from './lib.mjs';
 
 test('Rejects invalid IDs and stale snapshots',()=>{
@@ -34,4 +36,15 @@ test('Article builder preserves photos and greetings and detects missing assets'
   assert.ok(stats.text.some(t=>t.includes('Greeting')));
   assert.throws(()=>buildArticle(content,{}),/Missing uploaded asset/);
   assert.throws(()=>buildArticle({...content,greetings:[]},assets));
+});
+test('CLI parser accepts arbitrary option string values and rejects missing values',()=>{
+  const cli=fileURLToPath(new URL('./xiumi.mjs',import.meta.url));
+  const parse=args=>spawnSync(process.execPath,[cli,'help','--cdp','http://127.0.0.1:9222',...args],{encoding:'utf8'});
+  const leading=parse(['--from','--draft','--to','updated']);
+  assert.equal(leading.status,0,leading.stderr);
+  const empty=parse(['--from','old','--to','']);
+  assert.equal(empty.status,0,empty.stderr);
+  const missing=parse(['--from']);
+  assert.equal(missing.status,1);
+  assert.match(missing.stderr,/Expected --option value: --from/);
 });

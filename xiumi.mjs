@@ -18,7 +18,7 @@ async function loadChromium() {
 const [command='help',...argv]=process.argv.slice(2);
 const options={};
 for(let i=0;i<argv.length;i++) {
-  if(!argv[i].startsWith('--') || !argv[i+1] || argv[i+1].startsWith('--')) throw new Error(`Expected --option value: ${argv[i]}`);
+  if(!argv[i].startsWith('--') || i+1>=argv.length) throw new Error(`Expected --option value: ${argv[i]}`);
   options[argv[i].slice(2)]=argv[++i];
 }
 const endpoint=options.cdp || process.env.XIUMI_CDP || 'http://127.0.0.1:9222';
